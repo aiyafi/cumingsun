@@ -1,4 +1,4 @@
-# Inter Epoxy Resin
+# Coming Soon Page for UGD
 
 A stunning 3D "Coming Soon" page for UGD featuring glass-like epoxy resin text effects built with React Three Fiber.
 
