@@ -118,7 +118,7 @@ export function App() {
         autoRotateSpeed={-0.1}
         // Smooth zoom settings
         zoomSpeed={0.5}
-        zoomToCursor={true}
+        zoomToCursor={false}
         enableDamping={true}
         dampingFactor={0.02}
         // Zoom limits
