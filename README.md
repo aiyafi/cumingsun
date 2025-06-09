@@ -1,6 +1,6 @@
-# Coming Soon Page for UGD
+# Coming Soon Page for [UGD](https://github.com/gadjahduduk)
 
-A stunning 3D "Coming Soon" page for UGD featuring glass-like epoxy resin text effects built with React Three Fiber.
+A stunning 3D "Coming Soon" page for [UGD](https://github.com/gadjahduduk) featuring glass-like epoxy resin text effects built with React Three Fiber.
 
 ## ✨ Features
 
@@ -13,7 +13,7 @@ A stunning 3D "Coming Soon" page for UGD featuring glass-like epoxy resin text e
 
 ## 🚀 Demo
 
-[Live Demo]()
+[Live Demo](https://cumingsun.vercel.app/)
 
 ## 📱 Device Support
 
