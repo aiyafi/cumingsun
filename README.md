@@ -13,7 +13,7 @@ A stunning 3D "Coming Soon" page for [UGD](https://github.com/gadjahduduk) featu
 
 ## 🚀 Demo
 
-[Live Demo](https://cumingsun.vercel.app/)
+[Live Demo](https://www.gadjahduduk.life)
 
 ## 📱 Device Support
 
