@@ -1,8 +1,7 @@
 import { createRoot } from 'react-dom/client'
-import { Suspense, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import './styles.css'
 import { App } from './App'
-import { Loader } from './Loader'
 
 function Overlay() {
   const [currentTime, setCurrentTime] = useState(
@@ -88,9 +87,7 @@ function Overlay() {
 
 createRoot(document.getElementById('root')).render(
   <>
-    <Suspense fallback={<Loader />}>
-      <App />
-      <Overlay />
-    </Suspense>
+    <App />
+    <Overlay />
   </>
 )

@@ -29,6 +29,57 @@ export function App() {
     return () => window.removeEventListener('resize', checkDevice)
   }, [])
 
+  // Cursor interaction logic
+  useEffect(() => {
+    let isMouseDown = false
+    let hasMouseMoved = false
+
+    const handleMouseDown = (event) => {
+      // Only handle left mouse button
+      if (event.button === 0) {
+        isMouseDown = true
+        hasMouseMoved = false
+        document.body.classList.add('cursor-grab')
+        document.body.classList.remove('cursor-grabbing')
+      }
+    }
+
+    const handleMouseMove = (event) => {
+      if (isMouseDown) {
+        if (!hasMouseMoved) {
+          hasMouseMoved = true
+          document.body.classList.remove('cursor-grab')
+          document.body.classList.add('cursor-grabbing')
+        }
+      }
+    }
+
+    const handleMouseUp = (event) => {
+      if (event.button === 0) {
+        isMouseDown = false
+        hasMouseMoved = false
+        document.body.classList.remove('cursor-grab', 'cursor-grabbing')
+      }
+    }
+
+    // Add event listeners
+    document.addEventListener('mousedown', handleMouseDown)
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    
+    // Also handle mouse leave to reset cursor
+    document.addEventListener('mouseleave', handleMouseUp)
+
+    // Cleanup
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown)
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('mouseleave', handleMouseUp)
+      document.body.classList.remove('cursor-grab', 'cursor-grabbing')
+    }
+  }, [])
+
   const autoRotate = false
   const text = 'Coming Soon'
   const shadow = '#94cbff'

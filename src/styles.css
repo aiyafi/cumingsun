@@ -26,6 +26,17 @@ body {
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: none;
+  /* Default cursor */
+  cursor: default;
+}
+
+/* Cursor states */
+body.cursor-grab {
+  cursor: grab;
+}
+
+body.cursor-grabbing {
+  cursor: grabbing;
 }
 
 a {
@@ -48,6 +59,13 @@ svg {
   /* Prevent zoom on double tap */
   * {
     touch-action: manipulation;
+  }
+  
+  /* Disable custom cursor on mobile since it doesn't make sense for touch */
+  body,
+  body.cursor-grab,
+  body.cursor-grabbing {
+    cursor: default;
   }
 }
 
