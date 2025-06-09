@@ -112,17 +112,25 @@ export function App() {
       <Text config={config} rotation={[-Math.PI / 2, 0, 0]} position={[0, -1, 2.25]}>
         {text}
       </Text>
-      {/** Controls */}
+      {/** Smooth Controls with optimized zoom */}
       <OrbitControls
         autoRotate={autoRotate}
         autoRotateSpeed={-0.1}
-        zoomSpeed={0.25}
-        minZoom={30}
-        maxZoom={140}
+        // Smooth zoom settings
+        zoomSpeed={0.5}
+        zoomToCursor={true}
+        enableDamping={true}
+        dampingFactor={0.02}
+        // Zoom limits
+        minZoom={20}
+        maxZoom={100}
+        // Smooth rotation
         enablePan={false}
-        dampingFactor={0.05}
         minPolarAngle={Math.PI / 3}
         maxPolarAngle={Math.PI / 3}
+        // Additional smoothing
+        screenSpacePanning={false}
+        keyPanSpeed={7.0}
       />
       {/** The environment is just a bunch of shapes emitting light. This is needed for the clear-coat */}
       <Environment resolution={16}>
