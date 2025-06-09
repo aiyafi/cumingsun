@@ -1,5 +1,5 @@
 import { RGBELoader } from 'three-stdlib'
-import { Canvas, useLoader } from '@react-three/fiber'
+import { Canvas, useLoader, useFrame } from '@react-three/fiber'
 import {
   Center,
   Text3D,
@@ -12,10 +12,13 @@ import {
   AccumulativeShadows,
   MeshTransmissionMaterial
 } from '@react-three/drei'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 export function App() {
   const [isMobile, setIsMobile] = useState(false)
+  const controlsRef = useRef()
+  const targetZoom = useRef(40)
+  const currentZoom = useRef(40)
   
   useEffect(() => {
     const checkDevice = () => {
@@ -29,13 +32,33 @@ export function App() {
     return () => window.removeEventListener('resize', checkDevice)
   }, [])
 
+  // Smooth zoom implementation
+  useEffect(() => {
+    const handleWheel = (event) => {
+      event.preventDefault()
+      
+      // Smooth zoom speed
+      const zoomSpeed = 0.002
+      const delta = event.deltaY * zoomSpeed
+      
+      // Update target zoom
+      targetZoom.current = Math.max(15, Math.min(80, targetZoom.current + delta))
+    }
+
+    // Add wheel listener with passive: false to prevent default
+    window.addEventListener('wheel', handleWheel, { passive: false })
+    
+    return () => {
+      window.removeEventListener('wheel', handleWheel)
+    }
+  }, [])
+
   // Cursor interaction logic
   useEffect(() => {
     let isMouseDown = false
     let hasMouseMoved = false
 
     const handleMouseDown = (event) => {
-      // Only handle left mouse button
       if (event.button === 0) {
         isMouseDown = true
         hasMouseMoved = false
@@ -62,15 +85,11 @@ export function App() {
       }
     }
 
-    // Add event listeners
     document.addEventListener('mousedown', handleMouseDown)
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('mouseup', handleMouseUp)
-    
-    // Also handle mouse leave to reset cursor
     document.addEventListener('mouseleave', handleMouseUp)
 
-    // Cleanup
     return () => {
       document.removeEventListener('mousedown', handleMouseDown)
       document.removeEventListener('mousemove', handleMouseMove)
@@ -102,37 +121,35 @@ export function App() {
     color: 'white'
   }
 
-  // Adjust zoom for mobile devices
-  const cameraZoom = isMobile ? 25 : 40
+  // Set initial zoom based on device
+  const initialZoom = isMobile ? 25 : 40
+  if (targetZoom.current === 40 && isMobile) {
+    targetZoom.current = 25
+    currentZoom.current = 25
+  }
 
   return (
-    <Canvas shadows orthographic camera={{ position: [10, 20, 20], zoom: cameraZoom }} gl={{ preserveDrawingBuffer: true }}>
+    <Canvas shadows orthographic camera={{ position: [10, 20, 20], zoom: initialZoom }} gl={{ preserveDrawingBuffer: true }}>
+      <SmoothZoom controlsRef={controlsRef} targetZoom={targetZoom} currentZoom={currentZoom} />
       <color attach="background" args={['#f2f2f5']} />
       {/** The text and the grid */}
       <Text config={config} rotation={[-Math.PI / 2, 0, 0]} position={[0, -1, 2.25]}>
         {text}
       </Text>
-      {/** Smooth Controls with optimized zoom */}
+      {/** Controls with zoom disabled */}
       <OrbitControls
+        ref={controlsRef}
         autoRotate={autoRotate}
         autoRotateSpeed={-0.1}
-        // Smooth zoom settings
-        zoomSpeed={0.5}
-        zoomToCursor={false}
+        enableZoom={false}  // Disable default zoom
         enableDamping={true}
         dampingFactor={0.02}
-        // Zoom limits
-        minZoom={20}
-        maxZoom={100}
-        // Smooth rotation
         enablePan={false}
         minPolarAngle={Math.PI / 3}
         maxPolarAngle={Math.PI / 3}
-        // Additional smoothing
         screenSpacePanning={false}
-        keyPanSpeed={7.0}
       />
-      {/** The environment is just a bunch of shapes emitting light. This is needed for the clear-coat */}
+      {/** Environment and lighting remain the same */}
       <Environment resolution={16}>
         <group rotation={[-Math.PI / 4, -0.3, 0]}>
           <Lightformer intensity={20} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={[10, 10, 1]} />
@@ -142,12 +159,34 @@ export function App() {
           <Lightformer type="ring" intensity={2} rotation-y={Math.PI / 2} position={[-0.1, -1, -5]} scale={10} />
         </group>
       </Environment>
-      {/** Soft shadows */}
       <AccumulativeShadows frames={60} color={shadow} colorBlend={5} toneMapped={true} alphaTest={0.9} opacity={1} scale={30} position={[0, -1.01, 0]}>
         <RandomizedLight amount={4} radius={10} ambient={0.5} intensity={1} position={[0, 10, -10]} size={15} mapSize={1024} bias={0.0001} />
       </AccumulativeShadows>
     </Canvas>
   )
+}
+
+// Smooth zoom component
+function SmoothZoom({ controlsRef, targetZoom, currentZoom }) {
+  useFrame((state) => {
+    if (!controlsRef.current) return
+    
+    // Smooth interpolation (like Lenis)
+    const lerp = (start, end, factor) => start + (end - start) * factor
+    const smoothness = 0.08 // Adjust for more/less smoothness
+    
+    // Smoothly interpolate current zoom towards target
+    currentZoom.current = lerp(currentZoom.current, targetZoom.current, smoothness)
+    
+    // Apply zoom to camera
+    state.camera.zoom = currentZoom.current
+    state.camera.updateProjectionMatrix()
+    
+    // Update controls
+    controlsRef.current.update()
+  })
+  
+  return null
 }
 
 const Grid = ({ number = 15, lineWidth = 0.026, height = 0.5 }) => (
