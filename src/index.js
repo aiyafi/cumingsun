@@ -11,7 +11,7 @@ function Overlay() {
     })
   )
   
-  const [locationText, setLocationText] = useState('')
+  const [locationText, setLocationText] = useState(' ')
 
   useEffect(() => {
     const timer = setInterval(() => {
