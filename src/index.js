@@ -10,6 +10,8 @@ function Overlay() {
       minute: '2-digit'
     })
   )
+  
+  const [locationText, setLocationText] = useState('Loading location...')
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -24,7 +26,26 @@ function Overlay() {
     return () => clearInterval(timer)
   }, [])
 
-  const currentDate = new Date().toLocaleDateString('en-GB')
+  // Fetch location data
+  useEffect(() => {
+    const fetchLocation = async () => {
+      try {
+        const response = await fetch('https://ipapi.co/json/')
+        const data = await response.json()
+        
+        if (data.city && data.country_name) {
+          setLocationText(`Last visit from ${data.city}, ${data.country_name}`)
+        } else {
+          setLocationText('Last visit from Unknown location')
+        }
+      } catch (error) {
+        console.error('Failed to fetch location:', error)
+        setLocationText('Last visit from Unknown location')
+      }
+    }
+
+    fetchLocation()
+  }, [])
 
   return (
     <div
@@ -70,7 +91,7 @@ function Overlay() {
           right: 40,
           fontSize: '16px'
         }}>
-        {currentDate}
+        {locationText}
       </div>
       <div
         style={{
